@@ -9,12 +9,13 @@
 
 ## Description
 
-Deploy [restic](https://restic.net/) - fast, secure, efficient backup program.
+Deploy [restic](https://restic.net/) - fast, secure, efficient backup program and [runrestic](https://github.com/andreasnuesslein/runrestic/tree/master/runrestic) a python wrapper around restic.
 
 ## Requirements
 
 - Ansible > 2.2
 - bzip2 installed on deployer machine (same one where ansible is installed)
+- pip3 on the remote machine
 
 ## Role Variables
 
@@ -45,12 +46,6 @@ restic_sudo_command_whitelist:
 ```
 
 Then, in your actual backup command, add the command as `sudo -u root /usr/bin/some_backup_related_command_that_needs_sudo`.
-
-## Helpers
-
-This role also installs helper scripts to `restic_install_path`. These scripts are named after your repository and will ensure environment variables are correct for that repository.
-
-For example, if you have a restic repository named `testrepo`, you could use the `restic-testrepo` command, which will execute `restic` with the correct environment variables to manipulate that repository.
 
 ## Example
 

@@ -9,6 +9,11 @@
   tags:
     - restic_install
 
+- include: install_runrestic.yml
+  become: true
+  tags:
+    - runrestic_install
+
 - name: Whitelist restic to run certain commands with sudo
   template:
     src: 'restic.sudoers.j2'

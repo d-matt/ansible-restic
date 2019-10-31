@@ -1,0 +1,70 @@
+{{ ansible_managed | comment }}
+{%- set repo = item %}
+
+name = "{{ repo.name }}"
+
+repositories = {{ repo.urls | to_json }}
+
+[environment]
+RESTIC_PASSWORD = {{ repo.password | trim | quote }}
+# or RESTIC_PASSWORD_FILE
+# https://restic.readthedocs.io/en/latest/040_backup.html#environment-variables
+{% if repo.remote_credentials is defined %}
+{% for k,v in repo.remote_credentials.items() %}
+{{ k | upper }}={{ v | trim | quote }}
+{% endfor %}
+{% endif %}
+
+[backup]
+sources = {{ repo.sources | to_json }}
+
+{% if repo.exclude_patterns is defined %}
+pre_hooks = {{ repo.exclude_patterns }}
+{% endif -%}
+{% if repo.exclude_files is defined %}
+post_hooks = {{ repo.exclude_files }}
+{% endif -%}
+
+{% if repo.pre_hooks is defined %}
+pre_hooks = {{ repo.pre_hooks }}
+{% endif -%}
+{% if repo.post_hooks is defined %}
+post_hooks = {{ repo.post_hooks }}
+{% endif -%}
+
+[prune]
+{% if repo.retention.last is defined %}
+keep-last = {{ repo.retention.last }}
+{% endif -%}
+{% if repo.retention.hourly is defined %}
+keep-hourly = {{ repo.retention.hourly }}
+{% endif -%}
+{% if repo.retention.daily is defined %}
+keep-daily = {{ repo.retention.daily }}
+{% endif -%}
+{% if repo.retention.weekly is defined %}
+keep-weekly = {{ repo.retention.weekly }}
+{% endif -%}
+{% if repo.retention.monthly is defined %}
+keep-monthly = {{ repo.retention.monthly }}
+{% endif -%}
+{% if repo.retention.yearly is defined %}
+keep-yearly = {{ repo.retention.yearly }}
+{% endif -%}
+{% if repo.retention.within is defined %}
+keep-within = {{ repo.retention.within }}
+{% endif -%}
+{% if repo.retention.tags is defined %}
+keep-tag = "{% for tag in item.retention.tags %}{{ tag }}{% if not loop.last %},{% endif %}{% endfor %}"
+{% endif %}
+
+group-by = "host,paths"
+# https://restic.readthedocs.io/en/latest/060_forget.html#removing-snapshots-according-to-a-policy
+
+[check]
+checks = ["check-unused", "read-data"]
+
+{% if restic_prometheus_dir %}
+[metrics.prometheus]
+path = "{{ restic_prometheus_dir }}/{{ repo.name }}.prom"
+{% endif -%}
