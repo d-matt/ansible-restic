@@ -44,6 +44,7 @@
   when:
     - item != None
     - item is not match("/dev/.*")
+  changed_when: false
 
 - name: Download client binary
   become: false
