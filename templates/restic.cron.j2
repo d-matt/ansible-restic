@@ -1,20 +1,11 @@
 # vi: ft=jinja.crontab
 {{ ansible_managed | comment }}
 {%- set repo = item %}
+
 MAILTO="{{ restic_cron_mailto }}"
 SHELL=/bin/sh
-PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:{{ restic_install_path }} 
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:{{ restic_install_path }}
 RUNRESTIC=runrestic -c {{ restic_conf_dir}}/{{ repo.name }}.toml
-
-{% if repo.retention is defined -%}
-# Apply retention policy
-{{ repo.retention_time | default('17 3 * * *') }} {{ restic_user }} $RUNRESTIC prune{% if restic_cron_stdout_file %} >>{{ restic_cron_stdout_file }}{% endif %}{% if restic_cron_stderr_file %} 2>>{{ restic_cron_stderr_file }}{% endif %}
-
-{% endif %}
-{% if repo.check | default(true) %}
-# Check repository
-{{ repo.check_time | default('17 4 * * *') }} {{ restic_user }} $RUNRESTIC check{% if restic_cron_stdout_file %} >>{{ restic_cron_stdout_file }}{% endif %}{% if restic_cron_stderr_file %} 2>>{{ restic_cron_stderr_file }}{% endif %}
-{%- endif %}
 
 # Do an actual backup
 {% for job in repo.jobs %}
