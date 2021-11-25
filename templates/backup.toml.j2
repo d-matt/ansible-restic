@@ -62,7 +62,7 @@ group-by = "host,paths"
 # https://restic.readthedocs.io/en/latest/060_forget.html#removing-snapshots-according-to-a-policy
 
 [check]
-checks = ["check-unused", "read-data"]
+checks = ["read-data"]
 
 {% if restic_prometheus_dir %}
 [metrics.prometheus]
